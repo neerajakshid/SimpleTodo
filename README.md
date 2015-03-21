@@ -6,3 +6,4 @@ Completed User Stories:
 * Required: User can long click on a particular item in a list and delete the item from the list
 Walkthrough of all the user stories:
  
+<IMG src="Simple_Todo_Walkthrough.gif"/>
