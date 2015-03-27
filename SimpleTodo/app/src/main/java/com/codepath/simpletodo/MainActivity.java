@@ -8,64 +8,57 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.EditText;
 import android.widget.ListView;
-import android.widget.Toast;
-
-import org.apache.commons.io.FileUtils;
-
-import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 
 public class MainActivity extends ActionBarActivity {
-    ArrayList<String>  items;
-    ArrayAdapter<String> itemsAdapter;
+    ArrayList<ItemModel> items;
+    ItemsAdapter itemsAdapter;
     ListView lvItems;
-    private final int REQUEST_CODE = 200;
+    ItemDatabase db;
+    private final int EDIT_REQUEST_CODE = 200;
+    private final int ADD_REQUEST_CODE = 100;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        db = new ItemDatabase(this.getBaseContext());
         ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayUseLogoEnabled(true);
         actionBar.setDisplayShowTitleEnabled(true);
         lvItems = (ListView) findViewById(R.id.lvItems);
         readItems();
-        itemsAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, items);
-        lvItems.setAdapter(itemsAdapter);
         setupListViewListener();
     }
 
 
     private void setupListViewListener() {
-        lvItems.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener () {
+        lvItems.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
 
             @Override
-            public boolean onItemLongClick (AdapterView < ? > parent, View view,int position,long id){
-                items.remove(position);
-                itemsAdapter.notifyDataSetChanged();
-                writeItems();
-                return true;
+            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+               ItemModel itemId = (ItemModel) lvItems.getItemAtPosition(position);
+               db.deleteItem(itemId);
+               readItems();
+               return true;
             }
 
         });
 
-       // set up onItemClickListener
+        // set up onItemClickListener
         lvItems.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Intent editPage = new Intent(MainActivity.this, EditItemActivity.class);
-                String selectedItem = items.get(position);
-                editPage.putExtra("text", selectedItem);
-                editPage.putExtra("position", position);
-                startActivityForResult(editPage, REQUEST_CODE);
+                ItemModel itemId = (ItemModel) lvItems.getItemAtPosition(position);
+                editPage.putExtra("id", (int)itemId.getId());
+                startActivityForResult(editPage, EDIT_REQUEST_CODE);
             }
         });
 
-        }
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -76,45 +69,35 @@ public class MainActivity extends ActionBarActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if(resultCode == RESULT_OK && requestCode == REQUEST_CODE){
+        if (resultCode == RESULT_OK && requestCode == EDIT_REQUEST_CODE) {
             String editText = data.getExtras().getString("EditText");
-            int position = data.getExtras().getInt("position");
-            items.set(position,editText);
-            itemsAdapter.notifyDataSetChanged();
-            writeItems();
-        }
-    }
-    public void onAddItem(View v){;
-        EditText etNewItem =  (EditText) findViewById (R.id.etNewItem);
-        String itemText = etNewItem.getText().toString();
-        if(itemText.matches("")) {
-            Toast.makeText(this, "Please enter an item to add", Toast.LENGTH_SHORT).show();
-            return;
-        } else{
-            itemsAdapter.add(itemText);
-            etNewItem.setText("");
-            writeItems();
+            int id = data.getExtras().getInt("id");
+            String priority = data.getExtras().getString("priority");
+            ItemModel editItem = new ItemModel(id, editText, priority);
+            db.updateItem(editItem);
+            readItems();
+        } else if(resultCode == RESULT_OK && requestCode == ADD_REQUEST_CODE){
+            String addText = data.getExtras().getString("AddText");
+            String priority = data.getExtras().getString("priority");
+            ItemModel addItem = new ItemModel(addText, priority);
+            writeItems(addItem);
         }
     }
 
-    private void readItems(){
-        File filesDir = getFilesDir();
-        File todoFile = new File(filesDir, "todo.txt");
-        try {
-            items = new ArrayList<String>(FileUtils.readLines(todoFile));
-        } catch (IOException e){
-            items = new ArrayList<String>();
-        }
+    public void onAddItem(View v) {
+        Intent addPage = new Intent(MainActivity.this, AddItemActivity.class);
+        startActivityForResult(addPage, ADD_REQUEST_CODE);
     }
-    private void writeItems(){
-        File filesDir = getFilesDir();
-        File todoFile = new File(filesDir, "todo.txt");
-        try {
-            items.trimToSize();
-            FileUtils.writeLines(todoFile, items);
-        } catch (IOException e){
-            e.printStackTrace();
-        }
+
+    private void readItems() {
+        items = db.getAllItems();
+        itemsAdapter = new ItemsAdapter(this, items);
+        lvItems.setAdapter(itemsAdapter);
+    }
+
+    private void writeItems(ItemModel newItem) {
+        db.addItemToDB(newItem);
+        readItems();
     }
 
     @Override

@@ -8,13 +8,18 @@ import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.Toast;
 
 
 public class EditItemActivity extends ActionBarActivity {
     EditText etEditItem;
-    int position;
+    Spinner spinner;
+    String priority;
+    int id;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -23,20 +28,56 @@ public class EditItemActivity extends ActionBarActivity {
         actionBar.setDisplayUseLogoEnabled(true);
         actionBar.setDisplayShowTitleEnabled(true);
         etEditItem = (EditText) findViewById(R.id.etEditItem);
-        String text = getIntent().getStringExtra("text");
-        position = getIntent().getExtras().getInt("position");
-        etEditItem.setText(text);
+        spinner = (Spinner) findViewById(R.id.spinner);
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(
+                this, R.array.priority_array, android.R.layout.simple_spinner_item);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner.setAdapter(adapter);
+
+        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                priority = spinner.getSelectedItem().toString();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+                Toast.makeText(EditItemActivity.this, "Please select a priority", Toast.LENGTH_SHORT).show();
+                return;
+            }
+        });
+        id = getIntent().getExtras().getInt("id");
+        ItemDatabase db = new ItemDatabase(this.getBaseContext());
+        ItemModel itemRes = db.getSingleItem(id);
+        etEditItem.setText(itemRes.getItemBody());
+        spinner.setSelection(getIndex(spinner, itemRes.getPriority()));
+    }
+
+    private int getIndex(Spinner spinner, String myString)
+    {
+        int index = 0;
+
+        for (int i=0;i<spinner.getCount();i++){
+            if (spinner.getItemAtPosition(i).toString().equalsIgnoreCase(myString)){
+                index = i;
+                break;
+            }
+        }
+        return index;
     }
     public void onSaveItem(View v){
         EditText etEditItem =  (EditText) findViewById (R.id.etEditItem);
         String editText = etEditItem.getText().toString();
+        spinner = (Spinner) findViewById(R.id.spinner);
+        priority = spinner.getSelectedItem().toString();
         if(editText.matches("")) {
             Toast.makeText(this, "Please enter an item", Toast.LENGTH_SHORT).show();
             return;
         }else{
             Intent editData = new Intent();
             editData.putExtra("EditText", editText);
-            editData.putExtra("position", position);
+            editData.putExtra("priority", priority);
+            editData.putExtra("id", id);
             setResult(RESULT_OK, editData);
             finish();
         }
