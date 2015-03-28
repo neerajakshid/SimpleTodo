@@ -10,7 +10,7 @@
         android:layout_height="wrap_content"
         android:text="Item Id"
         android:id="@+id/tvItemId"
-        android:layout_weight="1"
+        android:layout_weight="0"
         android:layout_gravity="center"
         />
     <TextView
@@ -26,6 +26,14 @@
         android:layout_height="wrap_content"
         android:text="Priority"
         android:id="@+id/tvPriority"
+        android:layout_alignParentLeft="true"
+        android:layout_weight="1"
+        android:layout_gravity="center"/>
+    <TextView
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Due Date"
+        android:id="@+id/tvDueDate"
         android:layout_alignParentLeft="true"
         android:layout_weight="1"
         android:layout_gravity="center"/>

@@ -7,6 +7,8 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,10 +32,12 @@ public class ItemsAdapter extends ArrayAdapter<ItemModel> {
         TextView tvItemId = (TextView) convertView.findViewById(R.id.tvItemId);
         TextView tvItemName = (TextView) convertView.findViewById(R.id.tvItemName);
         TextView tvPriority = (TextView) convertView.findViewById(R.id.tvPriority);
-
+        TextView tvDueDate = (TextView) convertView.findViewById(R.id.tvDueDate);
         // Populate the data into the template view using the data object
         tvItemName.setText(list.itemBody);
         tvPriority.setText(list.priority);
+        DateFormat df = new SimpleDateFormat("MM/dd/yyyy");
+        tvDueDate.setText(df.format(list.dueDate));
         tvItemId.setText(Integer.toString(list.id));
         tvItemId.setVisibility(View.GONE);
 

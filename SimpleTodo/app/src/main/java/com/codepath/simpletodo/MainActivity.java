@@ -1,7 +1,7 @@
 package com.codepath.simpletodo;
 
-import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.FragmentManager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
@@ -9,15 +9,17 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.Toast;
 import java.util.ArrayList;
+import java.util.Date;
 
-public class MainActivity extends ActionBarActivity {
+public class MainActivity extends ActionBarActivity implements AddEditFragment.AddEditFragmentListener{
     ArrayList<ItemModel> items;
     ItemsAdapter itemsAdapter;
+    ItemModel selectedItem;
     ListView lvItems;
     ItemDatabase db;
-    private final int EDIT_REQUEST_CODE = 200;
-    private final int ADD_REQUEST_CODE = 100;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,6 +44,7 @@ public class MainActivity extends ActionBarActivity {
                ItemModel itemId = (ItemModel) lvItems.getItemAtPosition(position);
                db.deleteItem(itemId);
                readItems();
+               Toast.makeText(MainActivity.this, "Selected item deleted", Toast.LENGTH_SHORT).show();
                return true;
             }
 
@@ -51,13 +54,24 @@ public class MainActivity extends ActionBarActivity {
         lvItems.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Intent editPage = new Intent(MainActivity.this, EditItemActivity.class);
-                ItemModel itemId = (ItemModel) lvItems.getItemAtPosition(position);
-                editPage.putExtra("id", (int)itemId.getId());
-                startActivityForResult(editPage, EDIT_REQUEST_CODE);
+               // Intent editPage = new Intent(MainActivity.this, EditItemActivity.class);
+                selectedItem = (ItemModel) lvItems.getItemAtPosition(position);
+              //  editPage.putExtra("id", (int)itemId.getId());
+               // startActivityForResult(editPage, EDIT_REQUEST_CODE);
+                showEditDialog();
             }
         });
 
+    }
+    private void showEditDialog(){
+        FragmentManager fm = getSupportFragmentManager();
+        AddEditFragment alertDialog = AddEditFragment.newInstance("Edit Item");
+        alertDialog.show(fm, "fragment_add_edit_item");
+    }
+    private void showAddDialog(){
+        FragmentManager fm = getSupportFragmentManager();
+        AddEditFragment alertDialog = AddEditFragment.newInstance("Add Item");
+        alertDialog.show(fm, "fragment_add_edit_item");
     }
 
     @Override
@@ -66,9 +80,9 @@ public class MainActivity extends ActionBarActivity {
         getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
     }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+    // Using Activity
+    //@Override
+    /*protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (resultCode == RESULT_OK && requestCode == EDIT_REQUEST_CODE) {
             String editText = data.getExtras().getString("EditText");
             int id = data.getExtras().getInt("id");
@@ -82,11 +96,15 @@ public class MainActivity extends ActionBarActivity {
             ItemModel addItem = new ItemModel(addText, priority);
             writeItems(addItem);
         }
-    }
+    }*/
 
     public void onAddItem(View v) {
-        Intent addPage = new Intent(MainActivity.this, AddItemActivity.class);
-        startActivityForResult(addPage, ADD_REQUEST_CODE);
+       // Intent addPage = new Intent(MainActivity.this, AddItemActivity.class);
+        //startActivityForResult(addPage, ADD_REQUEST_CODE);
+
+       // using DialogFragment
+        selectedItem = null;
+        showAddDialog();
     }
 
     private void readItems() {
@@ -114,4 +132,21 @@ public class MainActivity extends ActionBarActivity {
 
         return super.onOptionsItemSelected(item);
     }
+
+    public ItemModel getSelectedItem(){
+        return selectedItem;
+    }
+
+    @Override
+    public void onFinishAddEditFragment(String itemName, String priority, Date dueDate) {
+            if (selectedItem == null) {
+                ItemModel newItem = new ItemModel(itemName, priority, dueDate);
+                writeItems(newItem);
+            } else {
+                int id = (int) selectedItem.getId();
+                ItemModel editItem = new ItemModel(id, itemName, priority, dueDate);
+                db.updateItem(editItem);
+                readItems();
+            }
+        }
 }
