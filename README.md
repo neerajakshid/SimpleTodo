@@ -7,9 +7,10 @@ Completed User Stories:
 * Required: User can click on a particular item and edit the item or its priority. The updated item displays in the list.
 * Required: User can long click on a particular item in a list and delete the item from the list.
 * Persist the todo items into SQLite using SQLiteOpenHelper.
-* Style of the todo items list improved by usind custom adapter.
+* Added the option of adding priority for each item (using DatePicker) and added to the list.
+* Style of the todo items list improved by using custom adapter.
 * Used DialogFragment instead of activity for adding/editing items.
-* Added the option of adding completion due dates for each item and added to the list.
+* Added the option of adding completion due dates for each item (using DatePicker) and added to the list.
 
 
 Walkthrough of all the user stories:
