@@ -11,7 +11,11 @@ Completed User Stories:
 * Style of the todo items list improved by using custom adapter.
 * Used DialogFragment instead of activity for adding/editing items.
 * Added the option of adding completion due dates for each item (using DatePicker) and added to the list.
-
+* Optional: Added an image for adding new items (using ImageButton) instead of a button
+* Optional: A scheduled notification to the user with the list of items based on the due date
+  - Notification will be generated on running the code from Android Studio 
+  - Then the notification is scheduled to trigger every 24 hours (using AlarmManager) even though the app is not in use
+  - Notification will not be trigerred when there are no action items for that day
 
 Walkthrough of all the user stories:
  
