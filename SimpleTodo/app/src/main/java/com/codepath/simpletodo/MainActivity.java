@@ -1,5 +1,9 @@
 package com.codepath.simpletodo;
 
+import android.app.AlarmManager;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.ActionBar;
@@ -11,6 +15,7 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.Toast;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 
 public class MainActivity extends ActionBarActivity implements AddEditFragment.AddEditFragmentListener{
@@ -19,22 +24,48 @@ public class MainActivity extends ActionBarActivity implements AddEditFragment.A
     ItemModel selectedItem;
     ListView lvItems;
     ItemDatabase db;
+    NotificationManager myNotificationManager;
+    private int notificationId = 111;
 
+    PendingIntent pendingIntent;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
         db = new ItemDatabase(this.getBaseContext());
         ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayUseLogoEnabled(true);
         actionBar.setDisplayShowTitleEnabled(true);
         lvItems = (ListView) findViewById(R.id.lvItems);
         readItems();
+
         setupListViewListener();
     }
 
+
+    protected void displayNotification() {
+        Calendar calendar = Calendar.getInstance();
+
+        calendar.set(Calendar.HOUR_OF_DAY, 14);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+        calendar.set(Calendar.AM_PM,Calendar.PM);
+
+
+        Intent myIntent = new Intent(MainActivity.this, Reciever.class);
+        pendingIntent = PendingIntent.getBroadcast(MainActivity.this, 0, myIntent,0);
+        AlarmManager alarmManager = (AlarmManager)getSystemService(ALARM_SERVICE);
+//      alarmManager.set(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pendingIntent);
+
+        alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(),1000*60*60*24, pendingIntent); // set repeating alarm to triger every 24 hours
+    }
+
+        @Override
+    protected void onStart() {
+        super.onStart();
+        displayNotification();
+     }
 
     private void setupListViewListener() {
         lvItems.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {

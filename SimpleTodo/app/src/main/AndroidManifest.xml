@@ -4,6 +4,8 @@
 
 
     <uses-sdk android:minSdkVersion="16" />
+    <uses-permission android:name='android.permission.WAKE_LOCK'/>
+    <uses-permission android:name="com.android.alarm.permission.SET_ALARM"/>
 
     <application
         android:allowBackup="true"
@@ -19,22 +21,10 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity
-            android:name=".EditItemActivity"
-            android:label="@string/title_activity_edit_item"
-            android:parentActivityName=".MainActivity" >
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.codepath.simpletodo.MainActivity" />
-        </activity>
-        <activity
-            android:name=".AddItemActivity"
-            android:label="@string/add_item"
-            android:parentActivityName=".MainActivity" >
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.codepath.simpletodo.MainActivity" />
-        </activity>
+        <service android:name=".NotifyService"/>
+
+        <receiver android:name=".Reciever"/>
+
     </application>
 
 </manifest>

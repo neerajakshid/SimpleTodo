@@ -3,6 +3,7 @@ package com.codepath.simpletodo;
 import android.app.Activity;
 import android.support.v4.app.DialogFragment;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,7 +15,6 @@ import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Toast;
-
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;

@@ -5,6 +5,8 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
+
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -59,20 +61,22 @@ public class ItemDatabase extends SQLiteOpenHelper {
     }
 
     //querying selected item from the database
-    public ItemModel getSingleItem (int id ){
+    public String getItemsByDate (String date){
         SQLiteDatabase readDb = this.getReadableDatabase(); // Open database for reading
-        ItemModel item;
+        String todaysItems = "";
         Cursor cursor = readDb.query(TABLE_NAME, //table name
                                      new String []{KEY_ID, KEY_ITEM, KEY_PRIORITY}, // select column names
-                                     KEY_ID + "=?", new String [] {String.valueOf(id)}, // where
-                                     null, null, "due_date ASC", "100"); // Group by, having, order by and limit
-        cursor.moveToFirst();
-        item = new ItemModel(cursor.getString(1), cursor.getString(2),new Date(cursor.getLong(3)));
-        item.setId(cursor.getInt(cursor.getColumnIndexOrThrow(KEY_ID)));
-
-
+                                     KEY_DATE + "=?", new String [] {String.valueOf(date)}, // where
+                                     null, null, null, "100"); // Group by, having, order by and limit
+        while(cursor.moveToNext()) {
+            String s= cursor.getString(cursor.getColumnIndexOrThrow(KEY_ITEM));
+            todaysItems += s;
+            if(cursor.isLast() == false){
+                todaysItems += ", ";
+            }
+        }
         readDb.close();
-        return item;
+        return todaysItems;
     }
 
     // querying all the items from database
