@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -17,6 +18,7 @@ import android.widget.Toast;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 
 public class MainActivity extends ActionBarActivity implements AddEditFragment.AddEditFragmentListener{
     ArrayList<ItemModel> items;
@@ -39,44 +41,35 @@ public class MainActivity extends ActionBarActivity implements AddEditFragment.A
         actionBar.setDisplayShowTitleEnabled(true);
         lvItems = (ListView) findViewById(R.id.lvItems);
         readItems();
-
         setupListViewListener();
+        displayNotification();
     }
 
 
     protected void displayNotification() {
-        Calendar calendar = Calendar.getInstance();
+        Calendar cal = GregorianCalendar.getInstance();
 
-        calendar.set(Calendar.HOUR_OF_DAY, 14);
-        calendar.set(Calendar.MINUTE, 0);
-        calendar.set(Calendar.SECOND, 0);
-        calendar.set(Calendar.AM_PM,Calendar.PM);
-
-
+        cal.set(Calendar.HOUR_OF_DAY, 14);
+        cal.set(Calendar.MINUTE, 0);
+        cal.set(Calendar.SECOND, 0);
+        //calendar.set(Calendar.AM_PM,Calendar.PM);
         Intent myIntent = new Intent(MainActivity.this, Reciever.class);
         pendingIntent = PendingIntent.getBroadcast(MainActivity.this, 0, myIntent,0);
         AlarmManager alarmManager = (AlarmManager)getSystemService(ALARM_SERVICE);
 //      alarmManager.set(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pendingIntent);
-
-        alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(),1000*60*60*24, pendingIntent); // set repeating alarm to triger every 24 hours
+        alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, cal.getTimeInMillis(),1000*60*60*24, pendingIntent); // set repeating alarm to triger every 24 hours
     }
-
-        @Override
-    protected void onStart() {
-        super.onStart();
-        displayNotification();
-     }
 
     private void setupListViewListener() {
         lvItems.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
 
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-               ItemModel itemId = (ItemModel) lvItems.getItemAtPosition(position);
-               db.deleteItem(itemId);
-               readItems();
-               Toast.makeText(MainActivity.this, "Selected item deleted", Toast.LENGTH_SHORT).show();
-               return true;
+                ItemModel itemId = (ItemModel) lvItems.getItemAtPosition(position);
+                db.deleteItem(itemId);
+                readItems();
+                Toast.makeText(MainActivity.this, "Selected item deleted", Toast.LENGTH_SHORT).show();
+                return true;
             }
 
         });
@@ -85,10 +78,10 @@ public class MainActivity extends ActionBarActivity implements AddEditFragment.A
         lvItems.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-               // Intent editPage = new Intent(MainActivity.this, EditItemActivity.class);
+                // Intent editPage = new Intent(MainActivity.this, EditItemActivity.class);
                 selectedItem = (ItemModel) lvItems.getItemAtPosition(position);
-              //  editPage.putExtra("id", (int)itemId.getId());
-               // startActivityForResult(editPage, EDIT_REQUEST_CODE);
+                //  editPage.putExtra("id", (int)itemId.getId());
+                // startActivityForResult(editPage, EDIT_REQUEST_CODE);
                 showEditDialog();
             }
         });
@@ -129,11 +122,11 @@ public class MainActivity extends ActionBarActivity implements AddEditFragment.A
         }
     }*/
 
-    public void onAddItem(View v) {
-       // Intent addPage = new Intent(MainActivity.this, AddItemActivity.class);
+    public void onAddItem() {
+        // Intent addPage = new Intent(MainActivity.this, AddItemActivity.class);
         //startActivityForResult(addPage, ADD_REQUEST_CODE);
 
-       // using DialogFragment
+        // using DialogFragment
         selectedItem = null;
         showAddDialog();
     }
@@ -158,6 +151,7 @@ public class MainActivity extends ActionBarActivity implements AddEditFragment.A
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
+            onAddItem();
             return true;
         }
 
@@ -170,14 +164,14 @@ public class MainActivity extends ActionBarActivity implements AddEditFragment.A
 
     @Override
     public void onFinishAddEditFragment(String itemName, String priority, Date dueDate) {
-            if (selectedItem == null) {
-                ItemModel newItem = new ItemModel(itemName, priority, dueDate);
-                writeItems(newItem);
-            } else {
-                int id = (int) selectedItem.getId();
-                ItemModel editItem = new ItemModel(id, itemName, priority, dueDate);
-                db.updateItem(editItem);
-                readItems();
-            }
+        if (selectedItem == null) {
+            ItemModel newItem = new ItemModel(itemName, priority, dueDate);
+            writeItems(newItem);
+        } else {
+            int id = (int) selectedItem.getId();
+            ItemModel editItem = new ItemModel(id, itemName, priority, dueDate);
+            db.updateItem(editItem);
+            readItems();
         }
+    }
 }

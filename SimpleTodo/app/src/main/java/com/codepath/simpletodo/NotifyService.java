@@ -6,7 +6,6 @@ import android.app.Service;
 import android.content.Intent;
 import android.os.IBinder;
 import android.support.v4.app.NotificationCompat;
-import android.util.Log;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -38,7 +37,7 @@ public class NotifyService extends Service {
         DateFormat df = new SimpleDateFormat("MM/dd/yyyy");
         String date = df.format(new Date());
         String notify = db.getItemsByDate(date);
-            String str = "Today's Action Items: " + notify;
+        String str = "Today's Action Items: " + notify;
         if (notify != "") {
             mManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
             Intent intent1 = new Intent(this.getApplicationContext(), MainActivity.class);

@@ -3,7 +3,6 @@ package com.codepath.simpletodo;
 import android.app.Activity;
 import android.support.v4.app.DialogFragment;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;

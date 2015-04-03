@@ -4,6 +4,7 @@
     <item name="green" type="color">#FF99CC00</item>
     <item name="orange" type="color">#FFFFBB33</item>
     <item name="black" type="color">#000000</item>
+    <item name="pink" type="color">#F9BAD4</item>
 
 
   </resources>
