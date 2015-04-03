@@ -61,6 +61,22 @@ public class ItemDatabase extends SQLiteOpenHelper {
     }
 
     //querying selected item from the database
+    public ItemModel getSingleItem (int id ){
+        SQLiteDatabase readDb = this.getReadableDatabase(); // Open database for reading
+        ItemModel item;
+        Cursor cursor = readDb.query(TABLE_NAME, //table name
+                new String []{KEY_ID, KEY_ITEM, KEY_PRIORITY}, // select column names
+                KEY_ID + "=?", new String [] {String.valueOf(id)}, // where
+                null, null, "due_date ASC", "100"); // Group by, having, order by and limit
+        cursor.moveToFirst();
+        item = new ItemModel(cursor.getString(1), cursor.getString(2),new Date(cursor.getLong(3)));
+        item.setId(cursor.getInt(cursor.getColumnIndexOrThrow(KEY_ID)));
+
+
+        readDb.close();
+        return item;
+    }
+
     public String getItemsByDate (String date){
         SQLiteDatabase readDb = this.getReadableDatabase(); // Open database for reading
         String todaysItems = "";
