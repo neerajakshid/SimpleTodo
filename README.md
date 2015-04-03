@@ -16,6 +16,9 @@ Completed User Stories:
   - Notification will be generated on running the code from Android Studio 
   - Then the notification is scheduled to trigger every 24 hours (using AlarmManager) even though the app is not in use
   - Notification will not be trigerred when there are no action items for that day
+* UI/UX modifications:
+  - Added background color to the main activity
+  - Moved the add icon to action bar for adding new items to the to-do list
 
 Walkthrough of all the user stories:
  
